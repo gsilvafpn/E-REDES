@@ -40,25 +40,69 @@
         <script src="data/VPIZP_4.js"></script>
         <script>
         var map = L.map('map', {
-            zoomControl:false, maxZoom:28, minZoom:1
-        }).fitBounds([[40.74769574341577,-8.073819676194],[40.75039841385427,-8.068235533642946]]);
-        var hash = new L.Hash(map);
-        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
-        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
-        // remove popup's row if "visible-with-data"
-        function removeEmptyRowsFromPopupContent(content, feature) {
-         var tempDiv = document.createElement('div');
-         tempDiv.innerHTML = content;
-         var rows = tempDiv.querySelectorAll('tr');
-         for (var i = 0; i < rows.length; i++) {
-             var td = rows[i].querySelector('td.visible-with-data');
-             var key = td ? td.id : '';
-             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
-                 rows[i].parentNode.removeChild(rows[i]);
-             }
-         }
-         return tempDiv.innerHTML;
-        }
+    		zoomControl: false,
+    		maxZoom: 28,
+    		minZoom: 1
+	}).fitBounds([[40.74769574341577, -8.073819676194], [40.75039841385427, -8.068235533642946]]);
+
+	var hash = new L.Hash(map);
+	map.attributionControl.setPrefix(
+    		'<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; ' +
+    		'<a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; ' +
+    		'<a href="https://qgis.org">QGIS</a>'
+	);
+
+	// Função para adicionar a localização do usuário
+	function addUserLocation() {
+    		if (!navigator.geolocation) {
+        		alert("Geolocalização não suportada pelo seu navegador.");
+        		return;
+    		}
+
+    		navigator.geolocation.getCurrentPosition(
+        		function (position) {
+            			var userLat = position.coords.latitude;
+            			var userLng = position.coords.longitude;
+
+            			var userMarker = L.marker([userLat, userLng], {
+                			icon: L.icon({
+                    				iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-red.png',
+                    				iconSize: [38, 38],
+                    				iconAnchor: [22, 37],
+                    				popupAnchor: [-3, -38]
+                			})
+            			}).addTo(map)
+                			.bindPopup("📍 Você está aqui!")
+                			.openPopup(); // Abre o popup automaticamente
+
+            			map.setView([userLat, userLng], 16); // Ajusta o zoom
+        		},
+        		function () {
+            			alert("Não foi possível obter sua localização.");
+        		}
+    		);
+	}
+
+	// Chama a função ao carregar a página
+	addUserLocation();
+
+	var autolinker = new Autolinker({ truncate: { length: 30, location: 'smart' } });
+
+	// Remove popup's row if "visible-with-data"
+	function removeEmptyRowsFromPopupContent(content, feature) {
+    		var tempDiv = document.createElement('div');
+    		tempDiv.innerHTML = content;
+    		var rows = tempDiv.querySelectorAll('tr');
+    		for (var i = 0; i < rows.length; i++) {
+        		var td = rows[i].querySelector('td.visible-with-data');
+        		var key = td ? td.id : '';
+        		if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+            			rows[i].parentNode.removeChild(rows[i]);
+        		}
+    		}
+    		return tempDiv.innerHTML;
+	}
+
         // add class to format popup if it contains media
 		function addClassToPopupIfMedia(content, popup) {
 			var tempDiv = document.createElement('div');
