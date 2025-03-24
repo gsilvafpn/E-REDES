@@ -55,7 +55,7 @@
 	// Função para adicionar a localização do usuário
 	function addUserLocation() {
     		if (!navigator.geolocation) {
-        		alert("Geolocalização não suportada pelo seu navegador.");
+        		alert("Geolocalização não é suportada pelo seu navegador.");
         		return;
     		}
 
@@ -64,21 +64,21 @@
             			var userLat = position.coords.latitude;
             			var userLng = position.coords.longitude;
 
-            			var userMarker = L.marker([userLat, userLng], {
-                			icon: L.icon({
-                    				iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-red.png',
-                    				iconSize: [38, 38],
-                    				iconAnchor: [22, 37],
-                    				popupAnchor: [-3, -38]
-                			})
-            			}).addTo(map)
-                			.bindPopup("📍 Você está aqui!")
-                			.openPopup(); // Abre o popup automaticamente
+            			// Criando um ícone azul personalizado (círculo pequeno)
+            			var blueIcon = L.divIcon({
+                			className: 'custom-blue-icon',
+                			iconSize: [12, 12], // Tamanho do ícone
+                			iconAnchor: [6, 6], // Centraliza o ícone no ponto
+            			});
 
-            			map.setView([userLat, userLng], 16); // Ajusta o zoom
+            			// Adiciona o marcador no mapa sem label/popup
+            			L.marker([userLat, userLng], { icon: blueIcon }).addTo(map);
+
+            			// Centraliza o mapa na localização do usuário
+            			map.setView([userLat, userLng], 16);
         		},
-        		function () {
-            			alert("Não foi possível obter sua localização.");
+        		function (error) {
+            			alert("Erro ao obter localização: " + error.message);
         		}
     		);
 	}
